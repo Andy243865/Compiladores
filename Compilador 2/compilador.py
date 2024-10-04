@@ -6,7 +6,7 @@ from anytree import Node, RenderTree
 
 # Define the lexer
 tokens = [
-    'PROGRAM', 'INT', 'FLOAT', 'BOOL', 'IDENTIFIER', 'NUMBER', 'FLOAT_NUMBER', 'BOOL_VALUE',
+    'MAIN', 'INT', 'FLOAT', 'BOOL', 'IDENTIFIER', 'NUMBER', 'FLOAT_NUMBER', 'BOOL_VALUE',
     'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'ASSIGN', 'LPAREN', 'RPAREN', 'LBRACE', 'RBRACE',
     'COMMA', 'SEMICOLON', 'COMMENT', 'MULTILINE_COMMENT', 'IF', 'THEN', 'ELSE', 'WHILE', 'DO',
     'FI', 'WRITE', 'AND', 'OR', 'EQUALS', 'NOTEQUALS', 'LESS', 'LESSEQUAL', 'GREATER', 'GREATEREQUAL',
@@ -38,8 +38,8 @@ t_ignore = ' \t'
 # Symbol table
 symbol_table = {}
 
-def t_PROGRAM(t):
-    r'program'
+def t_MAIN(t):
+    r'main'
     return t
 
 def t_INT(t):
@@ -129,9 +129,9 @@ def t_error(t):
 lexer = lex.lex()
 
 # Define the parser
-def p_program(p):
-    'program : PROGRAM LBRACE declarations statements RBRACE'
-    p[0] = Node('program', children=[p[3], p[4]])
+def p_main(p):
+    'main : MAIN LBRACE declarations statements RBRACE'
+    p[0] = Node('main', children=[p[3], p[4]])
 
 def p_declarations(p):
     '''declarations : declarations declaration
