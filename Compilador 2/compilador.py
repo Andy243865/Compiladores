@@ -175,9 +175,17 @@ def p_assignment(p):
     'assignment : IDENTIFIER ASSIGN expression SEMICOLON'
     if p[1] not in symbol_table:
         print(f"Error: Variable '{p[1]}' not declared.")
-    elif p[1] in symbol_table and symbol_table[p[1]] == 'bool' and p[3] not in ['true', 'false']:
-        print(f"Error: Cannot assign non-boolean value '{p[3]}' to boolean variable '{p[1]}'.")
+    elif (symbol_table[p[1]] == 'int' and not p[3].isdigit()) or \
+         (symbol_table[p[1]] == 'float' and not is_float(p[3])):
+        print(f"Error: Type mismatch in assignment to variable '{p[1]}'.")
     p[0] = Node('assignment', children=[Node(p[1]), Node(p[2]), p[3]])
+
+def is_float(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 def p_if_statement(p):
     '''if_statement : IF LPAREN condition RPAREN THEN LBRACE statements RBRACE ELSE LBRACE statements RBRACE FI
@@ -192,7 +200,9 @@ def p_write_statement(p):
     p[0] = Node('write_statement', children=[p[2]])
 
 def p_do_statement(p):
-    'do_statement : DO LBRACE statements RBRACE UNTIL LPAREN condition RPAREN SEMICOLON'
+    '''do_statement : DO LBRACE statements RBRACE WHILE LPAREN condition RPAREN SEMICOLON'''
+    if p[7] == 'empty':
+        print(f"Error: Incomplete 'while' condition at line {p.lineno}.")
     p[0] = Node('do_statement', children=[p[3], p[7]])
 
 def p_while_statement(p):
@@ -236,6 +246,8 @@ def p_condition(p):
                  | expression GREATEREQUAL expression
                  | expression AND expression
                  | expression OR expression'''
+    if len(p) < 4:
+        print(f"Error: Incomplete condition in line {p.lineno}.")
     p[0] = Node('condition', children=[p[1], Node(p[2]), p[3]])
 
 def p_empty(p):
@@ -251,6 +263,11 @@ def p_error(p):
         error_msg = 'Unexpected end of input'
         line = 'EOF'
     errors.append((line, error_msg))
+
+def p_expression_incomplete(p):
+    '''expression : expression PLUS empty
+                  | expression MINUS empty'''
+    print(f"Error: Incomplete expression at line {p.lineno}.")
 
 parser = yacc.yacc()
 
